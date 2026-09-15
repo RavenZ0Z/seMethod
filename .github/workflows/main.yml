@@ -12,20 +12,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 26
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '26'
+          java-version: '17'
           distribution: 'temurin'
 
-      - name: Compile with Maven
-        run: mvn compile
+      - name: Setup Docker network and MongoDB
+        run: |
+          docker network create --driver bridge se-methods
+          docker pull mongo
+          docker run -d --name mongo-dbserver --network se-methods mongo
+
+      - name: Build with Maven
+        run: mvn package
 
       - name: Build Docker Image
-        run: docker build -t devopsimage .
+        run: docker build -t semethods-app .
 
       - name: Run Docker Container
-        run: docker run --name devopscontainer -d devopsimage
+        run: docker run --network se-methods --name seMethods-app semethods-app
 
       - name: View Logs
-        run: docker logs devopscontainer
+        run: docker logs seMethods-app
