@@ -76,6 +76,35 @@ public class App
         }
     }
 
+    public Employee getEmployee(int ID)
+    {
+        try
+        {
+            Statement stmt = con.createStatement();
+            String strSelect =
+                    "SELECT * FROM employees WHERE emp_no = " + ID;
+
+            ResultSet rset = stmt.executeQuery(strSelect);
+
+            if (rset.next())
+            {
+                Employee emp = new Employee();
+                emp.emp_no = rset.getInt("emp_no");
+                emp.first_name = rset.getString("first_name");
+                emp.last_name = rset.getString("last_name");
+
+
+                return emp;
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+
+        return null;
+    }
+
     public static void main(String[] args)
     {
         // Create new Application
@@ -83,6 +112,16 @@ public class App
 
         // Connect to database
         a.connect();
+
+        // Get an employee
+        Employee emp = a.getEmployee(10001);
+
+        // Display employee
+        System.out.println(
+                emp.emp_no + " " +
+                        emp.first_name + " " +
+                        emp.last_name
+        );
 
         // Disconnect from database
         a.disconnect();
